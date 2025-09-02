@@ -53,35 +53,32 @@ float angle = 0;
 void setup() {
 Serial.begin(115200);
 Wire.begin();
-Serial.println("Setup started");
+
+
+  pinMode(echoPin,INPUT);
+  pinMode(triggerPin,OUTPUT);
+  pinMode(sel,INPUT);
+
+  if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;);
+  }
+  display.clearDisplay();
+  display.setFont(&FreeSerif9pt7b);
+  display.setTextColor(SSD1306_WHITE);  
+  display.setCursor(20,SCREEN_HEIGHT/2);
+  display.print("Instializing....");
+  display.display();
 
 Wire.beginTransmission(mpuAdd);
 Wire.write(0x6B);                           // power management register of mpu6050
 Wire.write(0x00);                           
 Wire.endTransmission();
  
-offsetCal(offsetX,offsetY,600);           // calculating the offset value of gyro with 600 sample 
-stop = millis();
-
-  pinMode(echoPin,INPUT);
-  pinMode(triggerPin,OUTPUT);
-  pinMode(sel,INPUT_PULLUP);
-
-  if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
-    Serial.println(F("SSD1306 allocation failed"));
-    for(;;);
-  }
-   display.clearDisplay();
-   display.drawPixel(20, 20, SSD1306_WHITE);
-
-  display.display();
+offsetCal(offsetX,offsetY,200);           // calculating the offset value of gyro with 600 sample 
+stop = 0;
 
 
-Wire.beginTransmission(mpuAdd);
-Wire.write(0x6B);                           // power management register of mpu6050
-Wire.write(0x00);                           
-Wire.endTransmission(true);
- 
 selPstate = digitalRead(sel);
 currentMode = 1;
 }
@@ -173,8 +170,8 @@ display.clearDisplay();
   display.drawRect(0,0,SCREEN_WIDTH,SCREEN_HEIGHT,SSD1306_WHITE);
   display.drawLine(SCREEN_WIDTH/2,0,SCREEN_WIDTH/2,SCREEN_HEIGHT,SSD1306_WHITE);
   display.drawLine(0,SCREEN_HEIGHT/2,SCREEN_WIDTH,SCREEN_HEIGHT/2,SSD1306_WHITE);
-  display.drawCircle((int)((SCREEN_WIDTH/2)+roll),(int)((SCREEN_HEIGHT/2)-pitch),7,SSD1306_WHITE);
-  display.fillCircle((int)((SCREEN_WIDTH/2)+roll),(int)((SCREEN_HEIGHT/2)-pitch),3,SSD1306_WHITE);
+  display.drawCircle((int)((SCREEN_WIDTH/2)+roll),(int)((SCREEN_HEIGHT/2)+pitch),7,SSD1306_WHITE);
+  display.fillCircle((int)((SCREEN_WIDTH/2)+roll),(int)((SCREEN_HEIGHT/2)+pitch),3,SSD1306_WHITE);
 
 display.display();
 break;
@@ -269,7 +266,7 @@ float angleCal(){
 
 void spiritLevel(float &roll, float &pitch){
   start = millis();
-  dt = (start - stop)/1000;
+  dt = (start - stop)/1000.0;
   stop = start;
 
   Wire.beginTransmission(mpuAdd);
@@ -303,8 +300,8 @@ void spiritLevel(float &roll, float &pitch){
     gx -= offsetX;
     gy -= offsetY;
 
-    roll = alpha*(roll + (gx*dt)) + (1.0-alpha)*(angleX);
-    pitch = alpha*(pitch + (gy*dt)) + (1.0-alpha)*(angleY);
+    pitch = alpha*(pitch + (gx*dt)) + (1.0-alpha)*(angleX);
+    roll = alpha*(roll + (gy*dt)) + (1.0-alpha)*(angleY);
 
       }
  
