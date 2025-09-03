@@ -5,6 +5,7 @@
 #include <Fonts/FreeSerif9pt7b.h>
 #include<Fonts/FreeSerif12pt7b.h>
 
+
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64 
 #define OLED_RESET     -1 
@@ -52,7 +53,11 @@ float angle = 0;
 
 float rollOffset = 0, pitchOffset = 0, angleOffset = 0;
 
-
+float maxRoll = 40;
+float minRoll = -40;
+bool calibrationFlagMax = false;
+bool calibrationFlagMin = false;
+bool calibration = false;
 void setup() {
 Serial.begin(115200);
 Wire.begin();
@@ -85,8 +90,8 @@ stop = 0;
 selPstate = digitalRead(sel);
 currentMode = 1;
 
-calibrateMPU();
-calibrateAngle();
+// calibrateMPU();
+// calibrateAngle();
 }
 
 void loop() {
@@ -184,10 +189,34 @@ case 4                                              :
 display.clearDisplay();
   display.setFont(&FreeSerif9pt7b);
   display.setTextColor(SSD1306_WHITE);  
-  display.setCursor(10, 13);  
-  display.print("Press the button");
+  display.setCursor(0,15);  
+  display.print("Tilt the box for  calibration");
+  if(roll>40){
+    calibrationFlagMax = true;
+  }
+  if(roll<-40){
+    calibrationFlagMin = true;
+  }
+  
+  if(calibrationFlagMax == true && calibrationFlagMin == true && calibration == false){
+  display.clearDisplay();
+  display.setFont(&FreeSerif9pt7b);
+  display.setTextColor(SSD1306_WHITE);  
+  display.setCursor(0,10);
+  display.print("Calibrating........ place the box at plane surface"); 
+  display.display();
+  delay(2000);
+  calibrateMPU();
+  calibrateAngle();
+  currentMode = 1;
+  calibrationFlagMax = false;
+  calibrationFlagMin = false;
+  calibration = true;
+  }
+
 display.display();
 break;
+
 
 }
 
@@ -351,6 +380,8 @@ void calibrateAngle(){
   }
   angleOffset = sumAngle / (float)sample;
 }
+
 float correctedAngle(){
   return angleCal() - angleOffset;
 }
+
