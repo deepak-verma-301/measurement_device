@@ -1,9 +1,11 @@
 #include <Wire.h>
+#include<EEPROM.h>
 #include<math.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <Fonts/FreeSerif9pt7b.h>
 #include<Fonts/FreeSerif12pt7b.h>
+
 
 
 #define SCREEN_WIDTH 128
@@ -52,6 +54,7 @@ unsigned long lastAngleCalTime = 0;
 float angle = 0;
 
 float rollOffset = 0, pitchOffset = 0, angleOffset = 0;
+float memRollOffset = 0, memPitchOffset = 0, memAngleOffset = 0;
 
 float maxRoll = 40;
 float minRoll = -40;
@@ -92,6 +95,14 @@ currentMode = 1;
 
 // calibrateMPU();
 // calibrateAngle();
+
+EEPROM.get(0,memAngleOffset);
+EEPROM.get(4,memRollOffset);
+EEPROM.get(8,memPitchOffset);
+
+angleOffset = memAngleOffset;
+rollOffset = memRollOffset;
+pitchOffset = memPitchOffset;
 }
 
 void loop() {
@@ -208,6 +219,9 @@ display.clearDisplay();
   delay(2000);
   calibrateMPU();
   calibrateAngle();
+  EEPROM.put(0,angleOffset);
+  EEPROM.put(4,rollOffset);
+  EEPROM.put(8,pitchOffset);
   currentMode = 1;
   calibrationFlagMax = false;
   calibrationFlagMin = false;
@@ -338,7 +352,6 @@ void spiritLevel(float &roll, float &pitch){
 
     pitch = alpha*(pitch + (gx*dt)) + (1.0-alpha)*(angleX);
     roll = alpha*(roll + (gy*dt)) + (1.0-alpha)*(angleY);
-
       }
  
 }
