@@ -50,6 +50,9 @@ float distance = 0;
 unsigned long lastAngleCalTime = 0;
 float angle = 0;
 
+float rollOffset = 0, pitchOffset = 0;
+
+
 void setup() {
 Serial.begin(115200);
 Wire.begin();
@@ -81,6 +84,8 @@ stop = 0;
 
 selPstate = digitalRead(sel);
 currentMode = 1;
+
+calibrateMPU();
 }
 
 void loop() {
@@ -120,7 +125,7 @@ if (selCstate != lastButtonState) {
 
 
 
-
+spiritLevel(roll,pitch);
 
   
 switch (currentMode){
@@ -162,7 +167,6 @@ display.clearDisplay();
 display.display();
 break;
 case 3:
-spiritLevel(roll,pitch);
 display.clearDisplay();
   display.setFont(&FreeSerif9pt7b);
   display.setTextColor(SSD1306_WHITE); 
@@ -170,12 +174,12 @@ display.clearDisplay();
   display.drawRect(0,0,SCREEN_WIDTH,SCREEN_HEIGHT,SSD1306_WHITE);
   display.drawLine(SCREEN_WIDTH/2,0,SCREEN_WIDTH/2,SCREEN_HEIGHT,SSD1306_WHITE);
   display.drawLine(0,SCREEN_HEIGHT/2,SCREEN_WIDTH,SCREEN_HEIGHT/2,SSD1306_WHITE);
-  display.drawCircle((int)((SCREEN_WIDTH/2)+roll),(int)((SCREEN_HEIGHT/2)+pitch),7,SSD1306_WHITE);
-  display.fillCircle((int)((SCREEN_WIDTH/2)+roll),(int)((SCREEN_HEIGHT/2)+pitch),3,SSD1306_WHITE);
+  display.drawCircle((int)((SCREEN_WIDTH/2)+correctedRoll()),(int)((SCREEN_HEIGHT/2)+correctedPitch()),7,SSD1306_WHITE);
+  display.fillCircle((int)((SCREEN_WIDTH/2)+correctedRoll()),(int)((SCREEN_HEIGHT/2)+correctedPitch()),3,SSD1306_WHITE);
 
 display.display();
 break;
-case 4:
+case 4                                              :
 display.clearDisplay();
   display.setFont(&FreeSerif9pt7b);
   display.setTextColor(SSD1306_WHITE);  
@@ -183,7 +187,9 @@ display.clearDisplay();
   display.print("Press the button");
 display.display();
 break;
+
 }
+
 
 
 }
@@ -306,3 +312,30 @@ void spiritLevel(float &roll, float &pitch){
       }
  
 }
+
+void calibrateMPU() {
+  long sumRoll = 0, sumPitch = 0;
+  float currentRoll =0;
+  float currentPitch =0;
+  int sample = 500;
+  for (int i = 0; i < sample; i++) {
+    spiritLevel(currentRoll,currentPitch);
+    sumRoll += currentRoll;
+    sumPitch += currentPitch;
+    delay(10);
+  }
+
+  rollOffset = sumRoll / (float)sample;
+  pitchOffset = sumPitch /(float)sample;
+}
+
+
+float correctedRoll() {
+
+  return roll - rollOffset;
+}
+
+float correctedPitch() {
+  return pitch - pitchOffset;
+}
+
