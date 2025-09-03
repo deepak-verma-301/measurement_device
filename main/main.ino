@@ -50,7 +50,7 @@ float distance = 0;
 unsigned long lastAngleCalTime = 0;
 float angle = 0;
 
-float rollOffset = 0, pitchOffset = 0;
+float rollOffset = 0, pitchOffset = 0, angleOffset = 0;
 
 
 void setup() {
@@ -86,6 +86,7 @@ selPstate = digitalRead(sel);
 currentMode = 1;
 
 calibrateMPU();
+calibrateAngle();
 }
 
 void loop() {
@@ -118,7 +119,7 @@ if (selCstate != lastButtonState) {
 
     if (millis() - lastAngleCalTime >= 50) {
     lastAngleCalTime = millis();
-    angle = angleCal();
+    angle = correctedAngle();
   }
 
 
@@ -339,3 +340,17 @@ float correctedPitch() {
   return pitch - pitchOffset;
 }
 
+void calibrateAngle(){
+  long sumAngle = 0;
+  float currentAngle = 0;
+  int sample = 400;
+  for(int i = 0; i < sample; i++){
+    currentAngle = angleCal();
+    sumAngle += currentAngle;
+    delay(10);
+  }
+  angleOffset = sumAngle / (float)sample;
+}
+float correctedAngle(){
+  return angleCal() - angleOffset;
+}
