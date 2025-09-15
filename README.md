@@ -71,4 +71,4 @@ This project integrates **distance measurement**, **angle measurement**, and a *
 ## 📲 Installation & Setup
 1. Clone this repository:
    ```bash
-   git clone https://github.com/<your-username>/<repo-name>.git
+   git clone https://github.com/deepak-verma-301/measurement_device.git
