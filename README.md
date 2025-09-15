@@ -61,6 +61,13 @@ This project integrates **distance measurement**, **angle measurement**, and a *
 
 ---
 
+
+## ⚛⚡⏚⎍ ⎓ ⎶  Circuit Digram 
+![Circuit Digram](circuit.png)
+
+
+---
+
 ## 📲 Installation & Setup
 1. Clone this repository:
    ```bash
