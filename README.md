@@ -28,7 +28,7 @@ This project integrates **distance measurement**, **angle measurement**, and a *
   - No need to recalibrate every power cycle.
 
 - **User Interface**  
-  - Modes are selected via a push button (debounced).  
+  - Modes are selected via a touch switch.  
   - Mode cycles between:  
     1. Distance  
     2. Angle  
@@ -42,7 +42,7 @@ This project integrates **distance measurement**, **angle measurement**, and a *
 - **IMU**: MPU6050 (Accelerometer + Gyroscope)  
 - **Display**: 128×64 OLED (SSD1306 over I²C)  
 - **Sensor**: Ultrasonic Sensor (HC-SR04)  
-- **Push Button**: For mode switching  
+- **TTP223 touch sensor**: For mode switching  
 - **EEPROM**: Built-in (Arduino) to store calibration offsets  
 
 ---
@@ -54,7 +54,7 @@ This project integrates **distance measurement**, **angle measurement**, and a *
 | OLED (SDA, SCL)  | A4, A5 (I²C)    |
 | Ultrasonic Trig  | D7              |
 | Ultrasonic Echo  | D6              |
-| Mode Button      | D8              |
+| TTP223 switch    | D8              |
 | MPU6050 (SDA,SCL)| A4, A5 (I²C)    |
 
 *(Adjust pins if using ESP8266 or STM32.)*
